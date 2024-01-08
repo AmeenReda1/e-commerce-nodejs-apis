@@ -5,6 +5,7 @@ const ApiError = require("../utils/apiError");
 const orderModel = require('../models/orderModel')
 const productModel = require('../models/productModel')
 const cartModel = require('../models/cartModel')
+const userModel = require('../models/userModel')
 const factory=require('../services/handlersFactory')
 
 // @desc create cash Order for logged user using his cart
@@ -133,6 +134,44 @@ exports.checkoutSession=asyncHandler(async(req,res,next)=>{
     res.status(200).json({status:"success",session})
 })
 
+
+const createCardOrder=async(session)=>{
+    const cartId=session.client_reference_id
+    const shippingAddress=session.metadata
+    const orderPrice=session.displayItems[0].amount/100
+    const cart=cartModel.findById({cartId})
+    const user=userModel.findOne({email:session.customer_email})
+
+    //3) create order with  payment Method cord
+    const order=await orderModel.create({
+        user:req.user._id,
+        cartItems:cart.cartItems,
+        shippingAddress,
+        totalOrderPrice:orderPrice,
+        isPaid:true,
+        paidAt:Date.now(),
+        paymentMethod:'card'
+
+
+    });
+    // 4) After creating Order decrement product quantity, increment product sold
+    if(order){
+        const bulkOption=cart.cartItems.map((item)=>({
+            updateOne:{
+                filter:{_id:item.product},
+                update:{$inc:{quantity:-item.quantity,sold: +item.quantity}},
+            }
+        }))
+        await productModel.bulkWrite(bulkOption,{})
+    // 5) clear cart depend on cartId
+    await cartModel.findByIdAndDelete(cartId)    
+
+    }
+
+
+
+}
+
 // @desc    This webhook will run when stripe payment success paid
 // @route   POST /webhook-checkout
 // @access  Protected/User
@@ -153,7 +192,7 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
     }
     if (event.type === 'checkout.session.completed') {
       //  Create order
-     console.log('created from here')
+     createCardOrder(session.data.object)
     }
   
     res.status(200).json({ received: true });

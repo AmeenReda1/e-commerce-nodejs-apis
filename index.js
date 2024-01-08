@@ -34,6 +34,8 @@ app.post(
 // to parse or convert body that came from the req from string to json to make it easy to dell with
 app.use(express.json())
 
+
+
 // enable any domain to access our apis
 app.use(cors())
 app.options('*',cors())
