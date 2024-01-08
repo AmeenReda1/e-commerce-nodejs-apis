@@ -14,6 +14,7 @@ const dbConnection = require('./config/database')
 const globalError = require('./middleware/errorMidlleware')
 const ApiError = require('./utils/apiError')
 const mountRoutes=require('./routes')
+const {webhookCheckout}=require('./services/orderService')
 //connect with db
 dbConnection();
 
@@ -29,6 +30,9 @@ app.use(cors())
 app.options('*',cors())
 // we want to compress all responses to make our app faster
 app.use(compression())
+
+// checkout webhook 
+app.post('/webhook-checkout',express.raw({type:'application/json'}),webhookCheckout)
 
 // to serve static files
 app.use(express.static(path.join(__dirname, 'uploads')))
