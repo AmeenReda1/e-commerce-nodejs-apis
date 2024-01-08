@@ -21,6 +21,15 @@ dbConnection();
 
 // express App
 const app = express();
+
+
+// Checkout webhook
+app.post(
+    '/webhook-checkout',
+    express.raw({ type: 'application/json' }),
+    webhookCheckout
+  );
+
 //Middlewares
 // to parse or convert body that came from the req from string to json to make it easy to dell with
 app.use(express.json())
@@ -31,12 +40,7 @@ app.options('*',cors())
 // we want to compress all responses to make our app faster
 app.use(compression())
 
-// Checkout webhook
-app.post(
-    '/webhook-checkout',
-    express.raw({ type: 'application/json' }),
-    webhookCheckout
-  );
+
 
 // to serve static files
 app.use(express.static(path.join(__dirname, 'uploads')))
