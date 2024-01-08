@@ -154,6 +154,7 @@ const createCardOrder=async(session)=>{
 
 
     });
+    console.log('done form create order')
     // 4) After creating Order decrement product quantity, increment product sold
     if(order){
         const bulkOption=cart.cartItems.map((item)=>({
