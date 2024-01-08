@@ -139,21 +139,20 @@ const createCardOrder=async(session)=>{
     const cartId=session.client_reference_id
     const shippingAddress=session.metadata
     const orderPrice=session.amount_total/100
-    const cart=cartModel.findById({cartId})
-    const user=userModel.findOne({email:session.customer_email})
+    const cart = await cartModel.findById(cartId);
+    const user = await userModel.findOne({ email: session.customer_email });
 
-    //3) create order with  payment Method cord
-    const order=await orderModel.create({
-        user:user._id,
-        cartItems:cart.cartItems,
-        shippingAddress,
-        totalOrderPrice:orderPrice,
-        isPaid:true,
-        paidAt:Date.now(),
-        paymentMethod:'card'
+    // 3) Create order with default paymentMethodType card
+  const order = await Order.create({
+    user: user._id,
+    cartItems: cart.cartItems,
+    shippingAddress,
+    totalOrderPrice: orderPrice,
+    isPaid: true,
+    paidAt: Date.now(),
+    paymentMethodType: 'card',
+  });
 
-
-    });
     console.log('done form create order')
     // 4) After creating Order decrement product quantity, increment product sold
     if(order){
@@ -193,7 +192,8 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
     }
     if (event.type === 'checkout.session.completed') {
       //  Create order
-     createCardOrder(event.data.object)
+      console.log('event compeleted yessssss')
+        createCardOrder(event.data.object)
     }
   
     res.status(200).json({ received: true });
