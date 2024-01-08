@@ -152,8 +152,6 @@ const createCardOrder=async(session)=>{
     paidAt: Date.now(),
     paymentMethod: 'card',
   });
-
-    console.log('done form create order')
     // 4) After creating Order decrement product quantity, increment product sold
     if(order){
         const bulkOption=cart.cartItems.map((item)=>({
@@ -192,7 +190,7 @@ exports.webhookCheckout = asyncHandler(async (req, res, next) => {
     }
     if (event.type === 'checkout.session.completed') {
       //  Create order
-      console.log('event compeleted yessssss')
+      
         createCardOrder(event.data.object)
     }
   
