@@ -144,7 +144,7 @@ const createCardOrder=async(session)=>{
 
     //3) create order with  payment Method cord
     const order=await orderModel.create({
-        user:req.user._id,
+        user,
         cartItems:cart.cartItems,
         shippingAddress,
         totalOrderPrice:orderPrice,
