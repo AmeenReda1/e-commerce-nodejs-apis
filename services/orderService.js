@@ -138,7 +138,7 @@ exports.checkoutSession=asyncHandler(async(req,res,next)=>{
 const createCardOrder=async(session)=>{
     const cartId=session.client_reference_id
     const shippingAddress=session.metadata
-    const orderPrice=session.displayItems[0].amount/100
+    const orderPrice=session.amount_total/100
     const cart=cartModel.findById({cartId})
     const user=userModel.findOne({email:session.customer_email})
 
