@@ -7,6 +7,11 @@ const dotenv = require('dotenv')
 const morgan = require('morgan')
 const cors=require('cors');
 const compression=require('compression')
+const rateLimit=require('express-rate-limit')
+const hpp=require('hpp')
+const mongoSanitize = require('express-mongo-sanitize');
+const {xss}=require('express-xss-sanitizer')
+
 
 // files from our project
 dotenv.config({ path: 'config.env' })
@@ -31,10 +36,12 @@ app.post(
   );
 
 //Middlewares
-// to parse or convert body that came from the req from string to json to make it easy to dell with
-app.use(express.json())
-
-
+// to parse or convert body that came from the req from string to json to make it easy to dell with 
+// and set limit size for the req to prevent hackers form sending big body in requests
+app.use(express.json({limit:'20kb'}))
+// To sanitize data:
+app.use(mongoSanitize());
+app.use(xss());
 
 // enable any domain to access our apis
 app.use(cors())
@@ -53,6 +60,16 @@ if (process.env.NODE_ENV === 'development') {
     console.log(`mode:${process.env.NODE_ENV}`)
 }
 
+limiter=rateLimit({
+    windowMs:15*60*1000,
+    max:5,
+    message:'Too Many Requests Please Try Again After 15 minutes'
+})
+
+app.use('/api/v1/auth',limiter)
+
+//middle ware to protect against http parameter pollution attacks 
+app.use(hpp())
 // Mount Routes
 mountRoutes(app)
 

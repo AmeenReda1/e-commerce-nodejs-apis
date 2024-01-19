@@ -8,6 +8,7 @@ const sendEmail=require('../utils/sendEmail')
 const UserModel = require("../models/userModel");
 const RefreshTokenModel=require("../models/refreshTokenModel")
 const ApiError = require("../utils/apiError");
+const {sanitizeUser}=require('../utils/sanitizeData')
 const {createToken,createRefreshToken}=require("../utils/createToken");
 
 // @desc  signup
@@ -24,7 +25,7 @@ exports.signup = asyncHandler(async (req, res, next) => {
   //2) generate token
   const token = createToken(user._id);
   
-  res.status(200).json({ data: user, token});
+  res.status(200).json({ data: sanitizeUser(user), token});
 });
 // @desc  login
 // route post /api/v1/auth/login
