@@ -109,9 +109,9 @@ const setImageUrl=(doc)=>{
     }
 }
 // work when we tried to findone or findall or uptdate
-ProductSchema.post('init',(doc)=>{
-    setImageUrl(doc)
-})
+// ProductSchema.post('init',(doc)=>{
+//     setImageUrl(doc)
+// })
 
 // work when create the doc in database
 ProductSchema.post('save',(doc)=>{
