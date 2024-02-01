@@ -37,8 +37,11 @@ app.post(
 
 //Middlewares
 // to parse or convert body that came from the req from string to json to make it easy to dell with 
+
 // and set limit size for the req to prevent hackers form sending big body in requests
 app.use(express.json({limit:'20kb'}))
+
+
 // To sanitize data:
 app.use(mongoSanitize());
 app.use(xss());
